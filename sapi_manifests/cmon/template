@@ -1,0 +1,30 @@
+{
+    "logLevel": "debug",
+    "address": "0.0.0.0",
+    "port": 9163,
+    "vmapi": {
+        "url": "http://{{{vmapi_domain}}}"
+    },
+    "cnapi": {
+        "url": "http://{{{cnapi_domain}}}"
+    },
+    "mahi": {
+        "url": "http://{{{mahi_domain}}}"
+    },
+    "changefeed_opts": {
+        "resource": "vm",
+        "subResources": ["destroyed","server_uuid","state"],
+        "instance": "{{{INSTANCE_UUID}}}"
+    },
+    "throttle_opts": {
+        "burst": 1000,
+        "rate" : 100,
+        "username": true,
+        "overrides": {
+            "{{{ufds_admin_login}}}": {
+                "burst": 0,
+                "rate": 0
+            }
+        }
+    }
+}

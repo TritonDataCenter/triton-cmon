@@ -1,0 +1,5 @@
+{
+    "name": "cmon",
+    "path": "/opt/triton/cmon/etc/config.json",
+    "post_cmd": "/usr/sbin/svcadm restart cmon"
+}

@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Copyright 2017 Joyent, Inc.
+#
+
+#
+# Rsync local changes to the cmon0 headnode zone
+#
+
+if [[ -n "$TRACE" ]]; then
+    export PS4='[\D{%FT%TZ}] ${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+    set -o xtrace
+fi
+set -o errexit
+set -o pipefail
+
+
+TOP=$(cd $(dirname $0)/../; pwd)
+NODE=$1
+
+if [[ -z "$ZONE" ]]; then
+    ZONE=$(ssh $NODE "vmadm lookup -1 alias=cmon0" 2>/dev/null)
+fi
+echo "Rsyncing local working copy to cmon0 zone $ZONE"
+
+rsyncOpts=
+if [[ $(uname -s) != "SunOS" ]]; then
+    rsyncOpts="--exclude *.node --exclude build"
+else
+    # Clean node_modules everytime.
+    ssh $NODE rm -rf /zones/$ZONE/root/opt/triton/cmon/node_modules
+fi
+
+rsync -av ${TOP}/ \
+    $NODE:/zones/$ZONE/root/opt/triton/cmon/ \
+    $rsyncOpts \
+    --exclude .git/ \
+    --exclude /node_modules/ \
+    --exclude /deps/ \
+    --exclude /docs/ \
+    --exclude /tmp/ \
+    --exclude /tools/
+rsync -av ${TOP}/boot/ \
+    $NODE:/zones/$ZONE/root/opt/smartdc/boot/
+
+state=$(ssh ${NODE} svcs -z ${ZONE} -H -o state cmon)
+if [[ "$state" == "maintenance" ]]; then
+    ssh ${NODE} svcadm -z ${ZONE} clear cmon
+else
+    ssh ${NODE} svcadm -z ${ZONE} restart cmon
+fi
+ssh ${NODE} svcadm -z ${ZONE} restart config-agent
