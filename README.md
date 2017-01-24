@@ -26,10 +26,6 @@ information.
 
 ## Development
 
-```
-make all
-```
-
 ## Test
 
 ```
@@ -41,6 +37,13 @@ make test
 ```
 make check
 ```
+
+## Release
+
+```
+make release
+```
+
 ## Documentation
 
 For an overview of the Triton Container Monitor solution, please see
