@@ -93,9 +93,14 @@ publish: release
 	mkdir -p $(BITS_DIR)/$(NAME)
 	cp $(TOP)/$(RELEASE_TARBALL) $(BITS_DIR)/$(NAME)/$(RELEASE_TARBALL)
 
-.PHONY: check
-check:: $(ESLINT)
+$(ESLINT):
+	npm install
+
+.PHONY: check-eslint
+check-eslint:: $(ESLINT)
 	$(ESLINT) -c $(ESLINT_CONF) $(ESLINT_FILES)
+
+check:: check-eslint
 
 include ./tools/mk/Makefile.deps
 ifeq ($(shell uname -s),SunOS)
