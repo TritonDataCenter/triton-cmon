@@ -52,6 +52,9 @@ For an overview of the Triton Container Monitor solution, please see
 For documentation specific to CMON, please see
 [docs/README.md](docs/README.md).
 
+For installation instructions and for an overview of how to use with
+prometheus, please see [docs/INSTALLING.md](docs/INSTALLING.md).
+
 ## License
 
 "Triton CMON" is licensed under the
