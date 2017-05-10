@@ -30,6 +30,8 @@ SMF_MANIFESTS_IN = smf/manifests/cmon.xml.in
 NODE_PREBUILT_VERSION=v4.8.1
 ifeq ($(shell uname -s),SunOS)
 	NODE_PREBUILT_TAG=zone64
+	# This is sdc-minimal-multiarch-lts@15.4.1, compat with
+	# triton-origin-multiarch-15.4.1.
 	NODE_PREBUILT_IMAGE=18b094b0-eb01-11e5-80c1-175dac7ddf02
 endif
 
