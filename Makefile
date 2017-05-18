@@ -41,6 +41,7 @@ endif
 include ./tools/mk/Makefile.smf.defs
 
 # other vars
+NAME		:= cmon
 RELEASE_TARBALL	:= $(NAME)-pkg-$(STAMP).tar.bz2
 RELSTAGEDIR	:= /tmp/$(STAMP)
 TAPE		= $(TOP)/node_modules/tape/bin/tape
