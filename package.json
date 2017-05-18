@@ -20,17 +20,16 @@
     "sdc-clients": "10.0.0",
     "sdc-scripts": "git+https://github.com/joyent/sdc-scripts.git#17fc5c8",
     "sshpk": "1.10.1",
+    "tape": "4.2.2",
     "vasync": "1.6.4",
     "verror": "1.8.1"
   },
   "devDependencies": {
-    "tape": "4.2.2",
     "eslint": "2.13.1",
     "eslint-plugin-joyent": "1.0.1"
   },
   "scripts": {
-    "start": "node ./server.js",
-    "test": "./node_modules/.bin/tap test/*.test.js"
+    "test": "./node_modules/.bin/tape test/*.test.js"
   },
   "license": "MPL-2.0"
 }

@@ -12,40 +12,53 @@
 # Makefile for CMON
 #
 
-CLEAN_FILES += ./node_modules
-DOC_FILES	 = index.md
-JS_FILES	:= $(shell find lib test bin -name '*.js')
+# 'make check' vars
+JS_FILES	:= ./bin/cmon $(shell find lib test -name '*.js')
 JSSTYLE_FILES	= $(JS_FILES)
-JSSTYLE_FLAGS	= -o indent=4,doxygen,unparenthesized-return=0
+JSSTYLE_FLAGS	= -f tools/jsstyle.conf
+JSL_FILES_NODE  = $(JS_FILES)
+JSL_CONF_NODE   = tools/jsl.node.conf
 ESLINT		= ./node_modules/.bin/eslint
+ESLINT_CONF	= tools/eslint.node.conf
 ESLINT_FILES	= $(JS_FILES)
 
+# sdcnode (aka prebuilt-node) vars
 NODE_PREBUILT_VERSION=v4.8.1
 NODE_PREBUILT_TAG=zone64
 NODE_PREBUILT_IMAGE=18b094b0-eb01-11e5-80c1-175dac7ddf02
 
-# Included definitions
+# eng.git Makefile includes. Use sdcnode on SunOS, but not other platforms.
 include ./tools/mk/Makefile.defs
 include ./tools/mk/Makefile.node_prebuilt.defs
+ifeq ($(shell uname -s),SunOS)
+	include ./tools/mk/Makefile.node_prebuilt.defs
+else
+	NPM=npm
+	NODE=node
+	NPM_EXEC=$(shell which npm)
+	NODE_EXEC=$(shell which node)
+endif
 include ./tools/mk/Makefile.smf.defs
 
+# other vars
 RELEASE_TARBALL	:= $(NAME)-pkg-$(STAMP).tar.bz2
-RELSTAGEDIR     := /tmp/$(STAMP)
-TAPE			= $(TOP)/node_modules/tape/bin/tape
+RELSTAGEDIR	:= /tmp/$(STAMP)
+TAPE		= $(TOP)/node_modules/tape/bin/tape
+CLEAN_FILES	+= ./node_modules
 
 #
 # Repo-specific targets
 #
 .PHONY: all
 all: | $(REPO_DEPS) $(NPM_EXEC)
-	$(NPM) install
+	$(NPM) install --production
 
 $(TAPE): | $(NPM_EXEC)
 	$(NPM) install
 
 .PHONY: test
 test: all | $(TAPE) $(NODE_EXEC)
-	TAPE=1 $(NODE) $(TAPE) test/*.test.js
+	$(NODE) $(TAPE) test/*.test.js
 
 .PHONY: release
 release: all docs $(SMF_MANIFESTS) $(NODE_EXEC)
@@ -77,16 +90,22 @@ publish: release
 	mkdir -p $(BITS_DIR)/$(NAME)
 	cp $(TOP)/$(RELEASE_TARBALL) $(BITS_DIR)/$(NAME)/$(RELEASE_TARBALL)
 
-$(ESLINT):
-		npm install eslint@2.13.1 eslint-plugin-joyent@1.0.1
+# Cherry-pick just the npm modules needed for the eslint check to speed up
+# `make check` on the CI checker.
+$(ESLINT): | $(NPM_EXEC)
+	$(NPM) install \
+	    eslint@`json -f package.json devDependencies.eslint` \
+	    eslint-plugin-joyent@`json -f package.json devDependencies.eslint-plugin-joyent`
 
 .PHONY: check-eslint
-check-eslint:: $(ESLINT)
-		$(ESLINT) $(ESLINT_FILES)
+check-eslint: | $(ESLINT)
+	$(ESLINT) -c $(ESLINT_CONF) $(ESLINT_FILES)
 
 check:: check-eslint
 
 include ./tools/mk/Makefile.deps
-include ./tools/mk/Makefile.node_prebuilt.targ
+ifeq ($(shell uname -s),SunOS)
+	include ./tools/mk/Makefile.node_prebuilt.targ
+endif
 include ./tools/mk/Makefile.smf.targ
 include ./tools/mk/Makefile.targ
