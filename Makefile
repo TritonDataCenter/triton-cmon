@@ -22,6 +22,8 @@ ESLINT		= ./node_modules/.bin/eslint
 ESLINT_CONF	= tools/eslint.node.conf
 ESLINT_FILES	= $(JS_FILES)
 
+SMF_MANIFESTS_IN = smf/manifests/cmon.xml.in
+
 # sdcnode (aka prebuilt-node) vars
 NODE_PREBUILT_VERSION=v4.8.1
 NODE_PREBUILT_TAG=zone64
