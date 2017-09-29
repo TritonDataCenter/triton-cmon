@@ -29,9 +29,12 @@ HOST=$1
 if [[ -z ${HOST} ]]; then
     HOST="coal"
 fi
+if [[ -z ${SSH_OPTS} ]]; then
+    SSH_OPTS=""
+fi
 
 # Code in this block runs on the remote system
-ssh ${HOST} <<EOF
+ssh ${SSH_OPTS} ${HOST} <<EOF
 . ~/.bash_profile
 
 function fatal() {
