@@ -25,7 +25,7 @@ ESLINT_FILES	= $(JS_FILES)
 SMF_MANIFESTS_IN = smf/manifests/cmon.xml.in
 
 # sdcnode (aka prebuilt-node) vars
-NODE_PREBUILT_VERSION=v4.8.1
+NODE_PREBUILT_VERSION=v4.8.5
 NODE_PREBUILT_TAG=zone64
 NODE_PREBUILT_IMAGE=18b094b0-eb01-11e5-80c1-175dac7ddf02
 
