@@ -13,7 +13,7 @@
     },
     "changefeed_opts": {
         "resource": "vm",
-        "subResources": ["destroyed","server_uuid","state"],
+        "subResources": ["alias","destroyed","server_uuid","state"],
         "instance": "{{{INSTANCE_UUID}}}"
     },
     "throttle_opts": {
