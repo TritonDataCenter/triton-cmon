@@ -20,16 +20,27 @@ PATH=/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin
 role=cmon
 
 function setup_tls_certificate() {
-    if [[ -f /data/tls/key.pem && -f /data/tls/cert.pem ]]; then
-        echo "TLS Certificate Exists"
+    if [[ -f /data/tls/base_key.pem && -f /data/tls/base_cert.pem ]]; then
+        echo "Base TLS Certificate Exists"
     else
-        echo "Generating TLS Certificate"
+        echo "Generating Base TLS Certificate"
         mkdir -p /data/tls
         /opt/local/bin/openssl req -x509 -nodes -subj "/CN=$DEFAULT_HOSTNAME" \
-            -newkey rsa:2048 -keyout /data/tls/key.pem \
-            -out /data/tls/cert.pem -days 365
+            -newkey rsa:2048 -keyout /data/tls/base_key.pem \
+            -out /data/tls/base_cert.pem -days 365
         # Remember the certificate's host name used in the cert.
         echo "$HOST" > /data/tls/hostname
+    fi
+
+    if [[ -f /data/tls/base_key.pem && -f /data/tls/base_cert.pem ]]; then
+        echo "Wildcard TLS Certificate Exists"
+    else
+        # The generated certificates are simply for local test. We don't need to
+        # generate a new cert since it won't be any more valid than the base
+        # cert.
+        echo "Generating Wildcard TLS Certificate"
+        cp /data/tls/base_cert.pem /data/tls/wildcard_cert.pem
+        cp /data/tls/base_key.pem /data/tls/wildcard_key.pem
     fi
 }
 
