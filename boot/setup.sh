@@ -26,7 +26,8 @@ function setup_tls_certificate() {
         echo "Generating TLS Certificate"
         mkdir -p /data/tls
         /opt/local/bin/openssl req -x509 -nodes -subj "/CN=$DEFAULT_HOSTNAME" \
-            -newkey rsa:2048 -keyout /data/tls/key.pem \
+            -pkeyopt ec_paramgen_curve:prime256v1 \
+            -newkey ec -keyout /data/tls/key.pem \
             -out /data/tls/cert.pem -days 365
         # Remember the certificate's host name used in the cert.
         echo "$HOST" > /data/tls/hostname
