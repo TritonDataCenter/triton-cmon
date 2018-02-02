@@ -27,6 +27,7 @@ function setup_tls_certificate() {
         mkdir -p /data/tls
         /opt/local/bin/openssl req -x509 -nodes -subj "/CN=$DEFAULT_HOSTNAME" \
             -pkeyopt ec_paramgen_curve:prime256v1 \
+            -pkeyopt ec_param_enc:named_curve \
             -newkey ec -keyout /data/tls/key.pem \
             -out /data/tls/cert.pem -days 365
         # Remember the certificate's host name used in the cert.
