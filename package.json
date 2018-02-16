@@ -18,7 +18,7 @@
     "mahi": "2.0.1",
     "restify": "4.1.1",
     "sdc-clients": "10.0.0",
-    "sdc-scripts": "git+https://github.com/joyent/sdc-scripts.git#17fc5c8",
+    "sdc-scripts": "git+https://github.com/joyent/sdc-scripts.git#bda632a",
     "sshpk": "1.10.1",
     "tape": "4.2.2",
     "vasync": "1.6.4",
