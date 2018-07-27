@@ -6,7 +6,7 @@
  */
 
 /*
- * Copyright (c) 2017, Joyent, Inc.
+ * Copyright (c) 2018, Joyent, Inc.
  */
 
 // jsl:ignore
@@ -18,12 +18,14 @@ var mod_bunyan = require('bunyan');
 var mod_fs = require('fs');
 var mod_path = require('path');
 var mod_restify = require('restify');
+var mod_triton_metrics = require('triton-metrics');
 var mod_vasync = require('vasync');
 var VError = require('verror').VError;
 
 var App = require('../lib/app');
 
 var CONFIG_PATH = mod_path.resolve(__dirname, '..', 'etc', 'config.json');
+var METRICS_SERVER_PORT = 8881;
 
 var log = mod_bunyan.createLogger({
     name: 'cmon',
@@ -67,7 +69,26 @@ function main() {
                 next();
             });
         },
+        function createMetricsCollector(arg, next) {
+            arg.config.metricsManager = mod_triton_metrics
+                .createMetricsManager({
+                address: arg.config.adminIp,
+                log: log.child({component: 'metrics'}),
+                port: METRICS_SERVER_PORT,
+                restify: mod_restify,
+                staticLabels: {
+                    datacenter: arg.config.datacenter,
+                    instance: arg.config.instanceUuid,
+                    server: arg.config.serverUuid,
+                    service: arg.config.serviceName
+                }
+            });
 
+            arg.config.metricsManager.createRestifyMetrics();
+            arg.config.metricsManager.listen(function metricsServerStarted() {
+                next();
+            });
+        },
         function createAndStartApp(arg, next) {
             var app = new App({config: arg.config, log: log});
             app.start(next);

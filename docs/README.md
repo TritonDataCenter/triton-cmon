@@ -200,3 +200,7 @@ Internal error
 
 * Check for ERROR and WARN output
 * Check for expected changefeed events
+
+## Metrics
+
+CMON exposes metrics via [node-triton-metrics](https://github.com/joyent/node-triton-metrics) on `http://<ADMIN_IP>:8881/metrics.`

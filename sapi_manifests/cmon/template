@@ -1,7 +1,13 @@
 {
     "logLevel": "debug",
     "address": "0.0.0.0",
+    "adminIp": "{{auto.ADMIN_IP}}",
+    "adminUuid": "{{{ufds_admin_uuid}}}",
+    "datacenter": "{{{datacenter_name}}}",
+    "instanceUuid": "{{auto.ZONENAME}}",
     "port": 9163,
+    "serviceName": "{{SERVICE_NAME}}",
+    "serverUuid": "{{auto.SERVER_UUID}}",
     "vmapi": {
         "url": "http://{{{vmapi_domain}}}"
     },
