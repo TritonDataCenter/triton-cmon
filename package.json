@@ -19,7 +19,7 @@
     "restify": "4.1.1",
     "sdc-clients": "11.3.1",
     "sdc-scripts": "git+https://github.com/joyent/sdc-scripts.git#deefaef587ed3bee2706cb6e53ee3468e682932e",
-    "sshpk": "1.10.1",
+    "sshpk": "1.14.2",
     "tape": "4.2.2",
     "triton-metrics": "0.2.0",
     "vasync": "1.6.4",
