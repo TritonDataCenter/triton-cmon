@@ -1,7 +1,7 @@
 {
   "name": "triton-cmon",
   "description": "Triton Container Monitor",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "author": "Joyent (joyent.com)",
   "repository": {
     "type": "git",
@@ -16,12 +16,13 @@
     "http-signature": "1.1.1",
     "lomstream": "1.1.0",
     "mahi": "2.0.1",
-    "restify": "4.1.1",
+    "restify": "4.2.0",
     "sdc-clients": "11.3.1",
     "sdc-scripts": "git+https://github.com/joyent/sdc-scripts.git#deefaef587ed3bee2706cb6e53ee3468e682932e",
     "sshpk": "1.14.2",
     "tape": "4.2.2",
     "triton-metrics": "0.2.0",
+    "triton-tags": "1.2.2",
     "vasync": "1.6.4",
     "verror": "1.8.1"
   },

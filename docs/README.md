@@ -83,6 +83,12 @@ time_of_day 1485284623598
 
 Retrieve containers that can be scraped by a Prometheus server for metrics.
 
+### Inputs
+
+| Field                | Type   | Required? | Notes                                                                                         |
+| -------------------- | ------ | --------- | --------------------------------------------------------------------------------------------- |
+| groups (query param) | String | No        | Comma separated list of triton.cmon.groups tags which have been previously added to a users containers. This allows for filtering out unwanted containers, which is mainly helpful for sharding ones prometheus instances by some meaningful set of group tags. All containers matching one or more of the provided groups will be returned. |
+
 ### Responses
 
 
@@ -95,11 +101,12 @@ Retrieve containers that can be scraped by a Prometheus server for metrics.
 
 ### Example
 ```
-GET https://cmon.<az>.triton.zone:9163/v1/discover
+GET https://cmon.<az>.triton.zone:9163/v1/discover?groups=foo,baz
 ---
 {
     "containers":[
         {
+            "groups":["foo","bar","baz"],
             "server_uuid":"44454c4c-5000-104d-8037-b7c04f5a5131",
             "source":"Bootstrapper",
             "vm_alias":"container01",
@@ -109,6 +116,7 @@ GET https://cmon.<az>.triton.zone:9163/v1/discover
             "cached_date":1484956672585
         },
         {
+            "groups":["foo","baz"],
             "server_uuid":"44454c4c-5000-104d-8037-b7c04f5a5131",
             "source":"Bootstrapper",
             "vm_alias":"container02",
