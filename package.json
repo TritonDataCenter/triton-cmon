@@ -1,7 +1,7 @@
 {
   "name": "triton-cmon",
   "description": "Triton Container Monitor",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "author": "Joyent (joyent.com)",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "sshpk": "1.14.2",
     "tape": "4.2.2",
     "triton-metrics": "0.2.0",
-    "triton-netconfig": "1.1.0",
+    "triton-netconfig": "1.3.0",
     "triton-tags": "1.2.2",
     "vasync": "1.6.4",
     "verror": "1.8.1"
