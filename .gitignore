@@ -1,5 +1,7 @@
+/make_stamps
 /node_modules
 /tmp
+/bits
 /build
 /etc/config.json
 /smf/manifests/cmon.xml
@@ -11,3 +13,4 @@ cscope.out
 /npm-debug.log
 *.swp
 describe
+cmon-pkg-*.tar.gz
