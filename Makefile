@@ -5,7 +5,7 @@
 #
 
 #
-# Copyright (c) 2019, Joyent, Inc.
+# Copyright 2019 Joyent, Inc.
 #
 
 #
@@ -29,9 +29,9 @@ ESLINT_FILES	= $(JS_FILES)
 SMF_MANIFESTS_IN = smf/manifests/cmon.xml.in
 
 # sdcnode (aka prebuilt-node) vars
-NODE_PREBUILT_VERSION=v4.9.0
+NODE_PREBUILT_VERSION=v6.17.0
 NODE_PREBUILT_TAG=zone64
-NODE_PREBUILT_IMAGE=18b094b0-eb01-11e5-80c1-175dac7ddf02
+NODE_PREBUILT_IMAGE=c2c31b00-1d60-11e9-9a77-ff9f06554b0f
 
 ifeq ($(shell uname -s),SunOS)
 	include ./deps/eng/tools/mk/Makefile.node_prebuilt.defs
@@ -51,7 +51,8 @@ RELSTAGEDIR	:= /tmp/$(NAME)-$(STAMP)
 TAPE		= $(TOP)/node_modules/tape/bin/tape
 CLEAN_FILES	+= ./node_modules
 
-BASE_IMAGE_UUID = 04a48d7d-6bb5-4e83-8c3b-e60a99e0f48f
+# our base image is triton-origin-x86_64-18.4.0
+BASE_IMAGE_UUID = a9368831-958e-432d-a031-f8ce6768d190
 BUILDIMAGE_NAME = $(NAME)
 BUILDIMAGE_DESC	= Triton Container Monitor
 AGENTS		= config registrar
