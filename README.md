@@ -10,11 +10,6 @@
 
 # Triton Container Monitor
 
-This repository is part of the Joyent Triton project. See the [contribution
-guidelines](https://github.com/joyent/triton/blob/master/CONTRIBUTING.md) --
-*Triton does not use GitHub PRs* -- and general documentation at the main
-[Triton project](https://github.com/joyent/triton) page.
-
 This is the home of the public facing portion of the Triton Container
 Monitor solution. Triton CMON acts as if it is many individual Prometheus
 node exporters by supporting a polling route per container per datacenter
