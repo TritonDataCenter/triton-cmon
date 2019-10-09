@@ -12,6 +12,8 @@
 # Makefile for CMON
 #
 
+SHELL := /bin/bash
+
 ENGBLD_USE_BUILDIMAGE   = true
 ENGBLD_REQUIRE          := $(shell git submodule update --init deps/eng)
 include ./deps/eng/tools/mk/Makefile.defs
