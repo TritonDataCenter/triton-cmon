@@ -10,7 +10,9 @@ pipeline {
 
     stages {
         stage('check') {
-            sh('make check')
+            steps{
+                sh('make check')
+            }
         }
     }
 }
