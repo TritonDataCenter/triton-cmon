@@ -22,6 +22,9 @@
         "subResources": ["alias","destroyed","server_uuid","state"],
         "instance": "{{{INSTANCE_UUID}}}"
     },
+    "server_opts" : {
+        "http_accept_encoding": "{{HTTP_ACCEPT_ENCODING}}"
+    },
     "throttle_opts": {
         "burst": 1000,
         "rate" : 100,
