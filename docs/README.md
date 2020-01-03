@@ -212,3 +212,47 @@ Internal error
 ## Metrics
 
 CMON exposes metrics via [node-triton-metrics](https://github.com/joyent/node-triton-metrics) on `http://<ADMIN_IP>:8881/metrics.`
+
+## CMON Configuration File
+
+By default, CMON's configuration file is located at "./etc/config.json". Any value
+in the table below that has a default value can be overrided in the configuration
+file.
+
+| var                              | type      | default    | description                                                             |
+| -------------------------------- | --------- | ---------- | ----------------------------------------------------------------------- |
+| address                          | String    | "0.0.0.0"  | Address on which CMON listens.                                          |
+| port                             | Number    | 9163       | Port number on which CMON listens.                                      |
+| adminIp                          | String    | -          | CMON instance IP address on admin network.                              |
+| adminUuid                        | String    | -          | Triton admin user uuid.                                                 |
+| datacenter                       | String    | -          | Triton datacenter name.                                                 |
+| instanceUuid                     | String    | -          | CMON instance uuid (this instance uuid).                                |
+| serviceName                      | String    | -          | CMON service name.                                                      |
+| serverUuid                       | String    | -          | CN uuid on on which this cmon instance runs.                            |
+| vmapi                            | Object    | -          | VMAPI configuration object.                                             |
+| vmapi.url                        | String    | -          | VMAPI url.                                                              |
+| cnapi                            | Object    | -          | CNAPI configuration object.                                             |
+| cnapi.url                        | String    | -          | CNAPI url.                                                              |
+| mahi                             | Object    | -          | Mahi configuration object.                                              |
+| mahi.url                         | String    | -          | Mahi url.                                                               |
+| changefeed_opts                  | Object    | -          | [changefeed](https://github.com/joyent/node-sdc-changefeed) options.    |
+| server_opts                      | Object    | -          | CMON server options.                                                    |
+| server_opts.http_accept_encoding | String    | -          | When set to "enabled" CMON honors 'Accept-Encoding'                     |
+| throttle_opts                    | Object    | -          | Restify [throttle](http://restify.com/docs/plugins-api/#throttle) opts. |
+
+
+
+
+## SAPI Configuration
+
+When using the config-agent service in a CMON zone, which draws metadata from
+SAPI, it's possible to change some of the defaults outlined in
+`CMON Configuration File` section above.
+
+In the SAPI "cmon" service, adding or changing the following keys in
+`metadata` can change some VMAPI behaviours for specialized circumstances in
+production.
+
+| key                            | type   | default   | description                                          |
+| ------------------------------ | ------ | --------- | ---------------------------------------------------- |
+| HTTP_ACCEPT_ENCODING           | String | ""        | Sets `server_opts.http_accept_encoding` above.       |
