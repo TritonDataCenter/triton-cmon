@@ -203,7 +203,7 @@ You have a few choices here:
 **Note:** Update with your own information.
 
      promserver# PRIVATE_KEY=~/.ssh/id_rsa
-     promserver# YOUR_ACOUNT_NAME=jay.schmidt
+     promserver# YOUR_ACCOUNT_NAME=jay.schmidt
      promserver# openssl rsa -in $PRIVATE_KEY -outform pem > promkey.pem
      promserver# openssl req -new -key promkey.pem -out promcsr.pem -subj "/CN=$YOUR_ACCOUNT_NAME"
      promserver# openssl x509 -req -days 365 -in promcsr.pem -signkey promkey.pem -out promcert.pem
