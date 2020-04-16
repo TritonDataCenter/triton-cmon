@@ -1,35 +1,37 @@
 # Introduction
 
-This procedure walks you through the process of setting up the Container
-Monitoring System, or CMON. This guide is intended to cover CMON itself, and
-only provides an example of setting Prometheus to monitor CMON. Adequately
-scaling Prometheus, or using alternative metric collection agents is outside
-the scope of this document.
+This procedure describes the process of setting up the Container Monitoring
+System, or CMON.
+
+This guide covers CMON itself, and only provides an example of setting up
+Prometheus to monitor CMON. Adequately scaling Prometheus, or using alternative
+metric collection agents is outside the scope of this document.
 
 This procedure assumes you have already completed the following prerequisite
 tasks:
 
 * Install Triton Data Center.
 * [Setup and configure Triton CNS][cns] (Triton Container Name Service).
-* Have the `node-triton` command line tool installed on your workstation.
+* Install the `node-triton` command line tool on your workstation.
 
 [cns]: https://github.com/joyent/triton-cns/blob/master/docs/operator-guide.md
 
 ## Install and Configure CMON
 
-This step only needs to be done one time per datacenter.
+Installing and configuring CMON is done once per data center.
 
 ### Create the CMON zone
 
-Update to the latest sdcadm
+Update to the latest sdcadm, run:
 
     sdcadm self-update --latest
 
-Install the cmon zone on the headnode
+Install the cmon zone on the headnode, run:
 
     sdcadm post-setup cmon
 
-Validate the cmon0 instance
+Validate the cmon0 instance. This example shows that the cmon0 instance was
+created.
 
     [root@headnode (eg1) ~]# sdcadm insts cmon
     INSTANCE                              SERVICE  HOSTNAME  VERSION                                     ALIAS
@@ -38,7 +40,8 @@ Validate the cmon0 instance
 ### Update/Install Agents
 
 The `cmon-agent` runs on every compute node and relays metrics for each running
-instance.
+instance. The example below shows updating the Triton agents, which will also
+ensure cmon-agent is on all compute nodes.
 
     [root@headnode (eg1) ~]# sdcadm experimental update-agents --latest --all
     Finding latest "agentsshar" on updates server (channel "release")
@@ -67,7 +70,8 @@ instance.
     Config-agent refreshed on updated servers
     Successfully updated agents (3m22s)
 
-Validate the agents
+Validate the agents. This example shows the `cmon-agent` is installed, and the
+status is `online`.
 
     [root@headnode (eg1) ~]# sdcadm insts cmon-agent
     INSTANCE                              SERVICE     HOSTNAME  VERSION  ALIAS
@@ -81,7 +85,7 @@ Validate the agents
     cn1                   online         Apr_08   svc:/smartdc/agent/cmon-agent:default
     cn2                   online         Apr_08   svc:/smartdc/agent/cmon-agent:default
 
-If necessary, check the `cmon-agent` service log for errors.
+If necessary, check the `cmon-agent` service log for errors. For example:
 
     [root@headnode (eg1) ~] headnode# tail -f $(svcs -L cmon-agent) | bunyan --color
     [2016-11-18T02:16:18.674Z]  INFO: cmon-agent/84455 on headnode: listening (url=http://10.99.99.7:9163)
@@ -92,30 +96,35 @@ If necessary, check the `cmon-agent` service log for errors.
 CMON scales horizontally. If/when you need to scale CMON for capacity, create
 additional instances, preferably on separate compute nodes.
 
+To create a cmon instance, run:
+
     sdcadm -s <compute_node_uuid> cmon
 
 ### Configure TLS for the CMON Service
 
-By default, cmon will instances will be deployed with a self-signed TLS
-certificate. It's highly recomended to use [`triton-dehydrated`][td] to
-generate a certificate via [Let's Encrypt][le]. You will need to create a SAN
-certificate with both a hostname and wildcard name. CMON will *only* use the
-DNS name configured for the external interface designated in [CNS][cns]. Unlike
-other Triton services, you *may not* use a CNAME. It's also *highly*
-recommended to use ECDSA. RSA certificates carry a severe performance penalty
-due to the added crypto overhead.
+By default, cmon instances will be deployed with a self-signed TLS
+certificate. It's highly recommended that you use [`triton-dehydrated`][td] to
+generate a certificate via [Let's Encrypt][le].
 
-Do this on the headnode. The TLS certificate will be deployed to all
-running CMON instances.
+You must create a SAN certificate with both a hostname and wildcard name. CMON
+will *only* use the DNS name configured for the external interface designated
+in [CNS][cns]. Unlike other Triton services, you *may not* use a CNAME.
 
-Create `domains.ecdsa.txt`, for example:
+It's also *highly* recommended to use ECDSA. RSA certificates carry a severe
+performance penalty due to the added crypto overhead.
+
+This needs to be done on headnode in each Triton Data Center. The TLS
+certificate will be deployed to all running CMON instances in that datacenter.
+
+Create `domains.ecdsa.txt`. The base name and wildcard name need to be on
+the same line. For example:
 
     cmon.eg1.cns.example.com *.cmon.eg1.cns.example.com
 
-Then generate your certificate.
+Then to generate your certificate run:
 
     cd /path/to/triton-dehydrated
-	./dehydrated -c -f config.ecdsa
+    ./dehydrated -c -f config.ecdsa
 
 See [`triton-dehycrated`][td] for additional information.
 
@@ -124,35 +133,55 @@ See [`triton-dehycrated`][td] for additional information.
 
 <!-- Note: link for CNS is above so it doesn't need to be repeated here. -->
 
+### Add CMON to the CloudAPI Services
+
+CloudAPI can be queried to discover additional services provided by the
+datacenter. Run this to
+
+Be sure to specify the correct CMON endpoint.
+
+    cmon_endpoint="https://cmon.eg1.cns.example.com:9163"
+
+    cloudapi_svc=$(sdc-sapi /services?name=cloudapi | json -H 0.uuid)
+    sapiadm get "$cloudapi_svc" \
+        | json -e "
+            svcs = JSON.parse(this.metadata.CLOUDAPI_SERVICES || '{}');
+            svcs.cmon = '$cmon_endpoint';
+            this.update = {metadata: {CLOUDAPI_SERVICES: JSON.stringify(svcs)}};
+        " update | sapiadm update "$cloudapi_svc"
+
+**Note:** This will cause a restart of the CloudAPI service.
+
 ### Create a Client Certificate for Accessing CMON
 
 Use the `node-triton` command line utility to generate a new key and sign a
-certificate to be used with CMON. This key/certificate pair will only be valid
-for use with CMON. It cannot be used to authenticate with CloudAPI or Docker.
-The certificate will be signed by the SSH key designated by your Triton profile
-`keyId`. If for some reason you remove the SSH key used to sign the
-certificate, this certificate will no longer be valid and you will need to
-generate a new key/certificate pair.
+certificate to be used with CMON. The certificate will be signed by the SSH
+key designated by your Triton profile `keyId`.
 
-Some users choose to create a dedicated SSH key for signing CMON keys.
+This key/certificate pair will only be valid for use with CMON. It cannot be
+used to authenticate against CloudAPI or Docker.
 
-Do this on your workstation.
+If for some reason you remove the SSH key used to sign the certificate, this
+certificate will no longer be valid and you will need to generate a new
+key/certificate pair. Some users choose to create a dedicated SSH key for
+signing CMON keys to avoid this.
+
+To generate the certificate, run this on your workstation:
 
     triton profile cmon-certgen
 
 You'll get two files, `cmon-<account>-key.pem` and `cmon-<account>-cert.pem`.
 The account used will be the one specified in your profile.
 
-After generating the key/certificate pair, you can either `scp` these to your
-prometheus instance or add them to the instance metadata. See [CloudAPI
-documentation][cloudapi-doc] for details.
-
-[cloudapi-doc]: https://github.com/joyent/sdc-cloudapi/blob/master/docs/index.md#updatemachinemetadata-post-loginmachinesidmetadata
+This key pair can be used with any Triton Data Center that shares the same
+UFDS database.
 
 ### Test your Certificate / Endpoint
 
 Use `curl` to validate that you are able to access CMON. You should get a 200
 response along with a JSON payload.
+
+To test CMON with curl, run:
 
     curl --include --cert-type pem \
         --cert "cmon-${TRITON_ACCOUNT}-cert.pem" \
@@ -161,14 +190,14 @@ response along with a JSON payload.
 
 ## Sample Prometheus Server
 
-Each account requires their own prometheus server, or some other way to scrape
+Each account requires their own Prometheus server, or some other way to scrape
 the endpoints exposed by the cmon service. For the purposes of this example, we
-will be using prometheus by downloading the prometheus binary directly. For
-other methods (distro package manager, compile yourself, etc.) see the
+will be using Prometheus by downloading the `prometheus` binary directly. For
+other methods (distribution package manager, compile yourself, etc.) see the
 respective documentation as necessary.
 
-**Note:** Adequately scaling a prometheus infrastructure is outside the scope
-of this document. There's an entire industry around this, and we would not
+**Important:** Adequately scaling a Prometheus infrastructure is outside the
+scope of this document. There's an entire industry around this, and we would not
 attempt to cover that topic here.
 
 ### Create an Instance
@@ -179,11 +208,17 @@ attempt to cover that topic here.
   line tools.
 * The owner should be the user that is the owner of the instances being
   monitored.
-* Any version of Linux that is supported by Prometheus is recommended. You can use
-  LX, KVM, or Bhyve.
+* Any version of Linux that is supported by Prometheus is recommended. You can
+  use LX, KVM, or Bhyve.
 * The required memory and disk space will depend on how many other instances
-  are being monitored 1GB of RAM and 15GB should be sufficient to collect metrics
-  for about 50 triton instances with a 14 day retention period.
+  are being monitored 1GB of RAM and 15GB should be sufficient to collect
+  metrics for about 50 triton instances with a 14 day retention period.
+
+You can either `scp` the client certificate/key you created earlier to your
+Prometheus instance or add them to the instance metadata. See [CloudAPI
+documentation][cloudapi-doc] for details.
+
+[cloudapi-doc]: https://github.com/joyent/sdc-cloudapi/blob/master/docs/index.md#updatemachinemetadata-post-loginmachinesidmetadata
 
 #### Example
 
@@ -193,8 +228,8 @@ an appropriately sized package available in your Triton datacenter.
 
     triton instance create ubuntu-certified-18.04 sample-1G
 
-**Note:** Copy the client certificate and key you created earlier to your
-prometheus instance. Remember to protect your Triton SSH key because it has
+**Important:** Copy the client certificate and key you created earlier to your
+Prometheus instance. Remember to protect your Triton SSH key because it has
 full access to everything in your account. Whereas the generated cmon sub-key
 can only be used for accessing CMON.
 
@@ -233,9 +268,9 @@ Consult the [Prometheus documentation][prom-site] for additional information.
 
 This script should be called `prometheus` and placed in `/etc/init.d/`. Adjust
 values as necessary. You can set it up to autostart if you desire. See the
-documentation for your distro's init system for additional information.
+documentation for your distribution's init system for additional information.
 
-     description "prometheus server"
+     description "Prometheus server"
      author      "Joyent"
      # used to be: start on startup
      # until we found some mounts weren't ready yet while booting
@@ -258,7 +293,7 @@ documentation for your distro's init system for additional information.
 Substitute values as appropriate. In this example the filename will be
 `prom-cmon.yml`.
 
-You can create jobs for additional datacenters, or create separate prometheus
+You can create jobs for additional datacenters, or create separate Prometheus
 instances.
 
     global:
@@ -266,7 +301,7 @@ instances.
       evaluation_interval: 8s
       # scrape_timeout is set to the global default 10s
 
-    ## Note: you can create multiple stanzas starting with "job_name"
+    ## You can create multiple stanzas starting with "job_name"
     scrape_configs:
     * job_name: triton
       scheme: https
