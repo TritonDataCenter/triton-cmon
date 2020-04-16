@@ -1,4 +1,4 @@
-## Installing and Configuring CMON
+# Introduction
 
 This procedure walks you through the process of setting up the Container
 Monitoring System, or CMON. This guide is intended to cover CMON itself, and
@@ -6,134 +6,205 @@ only provides an example of setting Prometheus to monitor CMON. Adequately
 scaling Prometheus, or using alternative metric collection agents is outside
 the scope of this document.
 
-This procedure assumes you have already completed the following tasks:
+This procedure assumes you have already completed the following prerequisite
+tasks:
 
-* Install Triton.
-* Setup  and configure Triton CNS (Triton Container Name Service).
+* Install Triton Data Center.
+* [Setup and configure Triton CNS][cns] (Triton Container Name Service).
 * Have the `node-triton` command line tool installed on your workstation.
 
-## Setup the Triton Installation
+[cns]: https://github.com/joyent/triton-cns/blob/master/docs/operator-guide.md
+
+## Install and Configure CMON
 
 This step only needs to be done one time per datacenter.
 
-* Update to the latest sdcadm
+### Create the CMON zone
 
-        headnode# sdcadm self-update --latest
+Update to the latest sdcadm
 
-* Install the cmon0 zone on the headnode
+    sdcadm self-update --latest
 
-        headnode# sdcadm post-setup cmon
+Install the cmon zone on the headnode
 
-* Validate the cmon0 instance
+    sdcadm post-setup cmon
 
-        headnode# sdcadm insts cmon
-        INSTANCE                              SERVICE  HOSTNAME  VERSION                                     ALIAS
-        fad6801f-0a6b-4c10-a0ad-18e7e6737181  cmon     headnode  release-20170316-20170315T212914Z-gd76e78a  cmon0
+Validate the cmon0 instance
 
-* Update the agents
+    [root@headnode (eg1) ~]# sdcadm insts cmon
+    INSTANCE                              SERVICE  HOSTNAME  VERSION                                     ALIAS
+    fad6801f-0a6b-4c10-a0ad-18e7e6737181  cmon     headnode  release-20170316-20170315T212914Z-gd76e78a  cmon0
 
-        headnode# sdcadm experimental update-agents --latest --all
-        Finding latest "agentsshar" on updates server (channel "release")
-        Latest is agentsshar cd27c168-c02e-48c3-896b-32b30e800863 (1.0.0-release-20170413-20170413T073348Z-g707200f)
-        Finding servers to update
+### Update/Install Agents
 
-        This update will make the following changes:
-            Ensure core agent SAPI services exist
-            Download agentsshar cd27c168-c02e-48c3-896b-32b30e800863
-                (1.0.0-release-20170413-20170413T073348Z-g707200f)
-            Update GZ agents on 2 (of 2) servers using
-                agentsshar 1.0.0-release-20170413-20170413T073348Z-g707200f
+The `cmon-agent` runs on every compute node and relays metrics for each running
+instance.
 
-        Would you like to continue? [y/N] Y
+    [root@headnode (eg1) ~]# sdcadm experimental update-agents --latest --all
+    Finding latest "agentsshar" on updates server (channel "release")
+    Latest is agentsshar cd27c168-c02e-48c3-896b-32b30e800863 (1.0.0-release-20170413-20170413T073348Z-g707200f)
+    Finding servers to update
 
-        Downloading agentsshar from updates server (channel "release")
-            to /var/tmp/agent-cd27c168-c02e-48c3-896b-32b30e800863.sh
-        Copy agentsshar to assets dir: /usbkey/extra/agents
-        Create /usbkey/extra/agents/latest symlink
-        Starting agentsshar update on 2 servers
-        Updating node.config       [=================================>] 100%  2
-        Downloading agentsshar     [=================================>] 100%  2
-        Installing agentsshar      [=================================>] 100%  2
-        Deleting temporary /var/tmp/agent-cd27c168-c02e-48c3-896b-32b30e800863.sh
-        Reloading sysinfo on updated servers
-        Sysinfo reloaded for all the running servers
-        Refreshing config-agent on all the updated servers
-        Config-agent refreshed on updated servers
-        Successfully updated agents (3m22s)
+    This update will make the following changes:
+        Ensure core agent SAPI services exist
+        Download agentsshar cd27c168-c02e-48c3-896b-32b30e800863
+            (1.0.0-release-20170413-20170413T073348Z-g707200f)
+        Update GZ agents on 2 (of 2) servers using
+            agentsshar 1.0.0-release-20170413-20170413T073348Z-g707200f
+     Would you like to continue? [y/N] Y
+     Downloading agentsshar from updates server (channel "release")
+        to /var/tmp/agent-cd27c168-c02e-48c3-896b-32b30e800863.sh
+    Copy agentsshar to assets dir: /usbkey/extra/agents
+    Create /usbkey/extra/agents/latest symlink
+    Starting agentsshar update on 2 servers
+    Updating node.config       [=================================>] 100%  2
+    Downloading agentsshar     [=================================>] 100%  2
+    Installing agentsshar      [=================================>] 100%  2
+    Deleting temporary /var/tmp/agent-cd27c168-c02e-48c3-896b-32b30e800863.sh
+    Reloading sysinfo on updated servers
+    Sysinfo reloaded for all the running servers
+    Refreshing config-agent on all the updated servers
+    Config-agent refreshed on updated servers
+    Successfully updated agents (3m22s)
 
-* Validate the agents (can check HN _and_ CNs)
+Validate the agents
 
-        headnode# tail -f $(svcs -L cmon-agent) | bunyan --color
-        [2016-11-18T02:16:18.674Z]  INFO: cmon-agent/84455 on headnode: listening (url=http://10.99.99.7:9163)
-        [2016-11-18T02:16:18.674Z]  INFO: cmon-agent/84455 on headnode: startup complete
+    [root@headnode (eg1) ~]# sdcadm insts cmon-agent
+    INSTANCE                              SERVICE     HOSTNAME  VERSION  ALIAS
+    9ad1e01c-fd15-4d80-b1ca-22bea979dd0c  cmon-agent  headnode  1.16.2   -
+    d26974d8-d579-4636-8d24-2abe2cb933af  cmon-agent  cn1       1.16.2   -
+    bcb3efc6-30d2-453f-8157-b09599521661  cmon-agent  cn2       1.16.2   -
 
-## Create additional CMON instances as necessary
+    [root@headnode (eg1) ~]# sdc-oneachnode -a 'svcs -H cmon-agent'
+    HOSTNAME              STATUS
+    headnode              online         Apr_08   svc:/smartdc/agent/cmon-agent:default
+    cn1                   online         Apr_08   svc:/smartdc/agent/cmon-agent:default
+    cn2                   online         Apr_08   svc:/smartdc/agent/cmon-agent:default
+
+If necessary, check the `cmon-agent` service log for errors.
+
+    [root@headnode (eg1) ~] headnode# tail -f $(svcs -L cmon-agent) | bunyan --color
+    [2016-11-18T02:16:18.674Z]  INFO: cmon-agent/84455 on headnode: listening (url=http://10.99.99.7:9163)
+    [2016-11-18T02:16:18.674Z]  INFO: cmon-agent/84455 on headnode: startup complete
+
+### Create additional CMON instances as necessary
 
 CMON scales horizontally. If/when you need to scale CMON for capacity, create
-additional instances.
+additional instances, preferably on separate compute nodes.
 
     sdcadm -s <compute_node_uuid> cmon
 
-## Configure TLS for CMON
+### Configure TLS for the CMON Service
 
 By default, cmon will instances will be deployed with a self-signed TLS
 certificate. It's highly recomended to use [`triton-dehydrated`][td] to
-generate a certificate via Let's Encrypt. You will need to create a SAN
+generate a certificate via [Let's Encrypt][le]. You will need to create a SAN
 certificate with both a hostname and wildcard name. CMON will *only* use the
-DNS name configured for the external interface designated in CMON. Unlike other
-Triton services, you *may not* use a CNAME. It's also *highly* recommended to
-use ECDSA. RSA certificates carry a severe performance penalty due to the added
-crypto overhead.
+DNS name configured for the external interface designated in [CNS][cns]. Unlike
+other Triton services, you *may not* use a CNAME. It's also *highly*
+recommended to use ECDSA. RSA certificates carry a severe performance penalty
+due to the added crypto overhead.
 
-Example `domains.ecdsa.txt`:
+Do this on the headnode. The TLS certificate will be deployed to all
+running CMON instances.
 
-    cmon.us-west-1.triton.zone *.cmon.us-west-1.triton.zone
+Create `domains.ecdsa.txt`, for example:
+
+    cmon.eg1.cns.example.com *.cmon.eg1.cns.example.com
 
 Then generate your certificate.
 
+    cd /path/to/triton-dehydrated
 	./dehydrated -c -f config.ecdsa
 
 See [`triton-dehycrated`][td] for additional information.
 
 [td]: https://github.com/joyent/triton-dehydrated
+[le]: https://www.letsencrypt.org/
 
-## Install the Prometheus Server
+<!-- Note: link for CNS is above so it doesn't need to be repeated here. -->
 
-Each user requires their own prometheus server, or some other way to scrape the
-endpoints exposed by the cmon zone. For the purposes of this procedure, we will
-be using prometheus. Note that you have two alternatives here - you can either
-build your own server and follow these steps to manually configure it, or you
-can build your own server and use the scripts designed to make it easier to set
-things up.
+### Create a Client Certificate for Accessing CMON
+
+Use the `node-triton` command line utility to generate a new key and sign a
+certificate to be used with CMON. This key/certificate pair will only be valid
+for use with CMON. It cannot be used to authenticate with CloudAPI or Docker.
+The certificate will be signed by the SSH key designated by your Triton profile
+`keyId`. If for some reason you remove the SSH key used to sign the
+certificate, this certificate will no longer be valid and you will need to
+generate a new key/certificate pair.
+
+Some users choose to create a dedicated SSH key for signing CMON keys.
+
+Do this on your workstation.
+
+    triton profile cmon-certgen
+
+You'll get two files, `cmon-<account>-key.pem` and `cmon-<account>-cert.pem`.
+The account used will be the one specified in your profile.
+
+After generating the key/certificate pair, you can either `scp` these to your
+prometheus instance or add them to the instance metadata. See [CloudAPI
+documentation][cloudapi-doc] for details.
+
+[cloudapi-doc]: https://github.com/joyent/sdc-cloudapi/blob/master/docs/index.md#updatemachinemetadata-post-loginmachinesidmetadata
+
+### Test your Certificate / Endpoint
+
+Use `curl` to validate that you are able to access CMON. You should get a 200
+response along with a JSON payload.
+
+    curl --include --cert-type pem \
+        --cert "cmon-${TRITON_ACCOUNT}-cert.pem" \
+        --key "cmon-${TRITON_ACCOUNT}-key.pem" \
+        "https://cmon.eg1.cns.example.com:9163/v1/discover"
+
+## Sample Prometheus Server
+
+Each account requires their own prometheus server, or some other way to scrape
+the endpoints exposed by the cmon service. For the purposes of this example, we
+will be using prometheus by downloading the prometheus binary directly. For
+other methods (distro package manager, compile yourself, etc.) see the
+respective documentation as necessary.
+
+**Note:** Adequately scaling a prometheus infrastructure is outside the scope
+of this document. There's an entire industry around this, and we would not
+attempt to cover that topic here.
 
 ### Create an Instance
 
 * This instance will need external connectivity (to reach the cmon instance).
   A fabric network is ideal, if available.
-* You can use either the portal guis (AdminUI or DevOps portal) or the command
+* You can use either the portal GUI (AdminUI or DevOps portal) or the command
   line tools.
-* The owner should be the user that is the owner of the containers being
+* The owner should be the user that is the owner of the instances being
   monitored.
-* Any version of Linux supported by Prometheus is recomended. You can use LX,
-  KVM, or Bhyve.
+* Any version of Linux that is supported by Prometheus is recommended. You can use
+  LX, KVM, or Bhyve.
 * The required memory and disk space will depend on how many other instances
-  are being monitored 1GB of RAM and 15GB is sufficient to collect metrics for
-  about 50 triton instances with a 14 day retention period.
+  are being monitored 1GB of RAM and 15GB should be sufficient to collect metrics
+  for about 50 triton instances with a 14 day retention period.
 
-**Example:**
+#### Example
 
 This example uses a sample package from the dev data that can be optional added
 to Triton for non-production environments. For a production environment, choose
 an appropriately sized package available in your Triton datacenter.
 
-     $ triton instance create ubuntu-certified-18.04 sample-1G
+    triton instance create ubuntu-certified-18.04 sample-1G
+
+**Note:** Copy the client certificate and key you created earlier to your
+prometheus instance. Remember to protect your Triton SSH key because it has
+full access to everything in your account. Whereas the generated cmon sub-key
+can only be used for accessing CMON.
 
 ### Configure DNS
 
-If you have already configured CNS for global name resolution resolver you can
-skip this step.  See the [CNS Operator's Guide][cns-op-g] for details.
+If you have already configured CNS for global name resolution skip this step.
+See the [CNS Operator's Guide][cns] for details. This is only necessary if you
+are unable to configure global name resolution.
 
-[cns-op-g]: https://github.com/joyent/triton-cns/blob/master/docs/operator-guide.md
+<!-- Note: link for CNS is above so it doesn't need to be repeated here. -->
 
 #### Get the external IP address for CNS
 
@@ -147,25 +218,22 @@ skip this step.  See the [CNS Operator's Guide][cns-op-g] for details.
 
 ### Install Prometheus
 
-It's recomended to use one of the following methods to install prometheus.
+[Download the latest release][prom-dl] of Prometheus for your platform,
+then extract it.
 
-* apt or apt-get
-* [download directly from prometheus][prom-dl]
-* [build via `go get`][prom-build]
+    promserver# tar xvfz prometheus-*.tar.gz
+    promserver# cd prometheus-*
 
-See the documentation for details on which method you choose.
+Consult the [Prometheus documentation][prom-site] for additional information.
 
 [prom-dl]: https://prometheus.io/download/
-[prom-build]: https://github.com/prometheus/prometheus#building-from-source
+[prom-site]: https://prometheus.io/
 
 ### Create a Service Startup Script
 
-This may not be necessary, depending on the installation method you chose.
-
-This script should be called `prometheus` and placed in
-`/etc/init.d/`. Adjust values as necessary. You can set it up to autostart if
-you desire. See the documentation for your init system for additional
-information.
+This script should be called `prometheus` and placed in `/etc/init.d/`. Adjust
+values as necessary. You can set it up to autostart if you desire. See the
+documentation for your distro's init system for additional information.
 
      description "prometheus server"
      author      "Joyent"
@@ -185,46 +253,13 @@ information.
         # optionally put a script here that will notifiy you prometheus has (re)started
      end script
 
-## Setup Authentication and Configuration
+### Create a Prometheus Configuration File
 
-This walks you through the process of setting up a certificate for accessing
-the metrics we are pulling.
+Substitute values as appropriate. In this example the filename will be
+`prom-cmon.yml`.
 
-### Create a Certificate from your private key
-
-Use the `node-triton` command line utility to generate a new key and sign a
-certificate to be used with CMON. This key/certificate pair will only be valid
-for use with CMON. It cannot be used to authenticate with CloudAPI or Docker.
-The certificate will be signed by the SSH key designated by your Triton profile
-`keyId`. If for some reason you remove the SSH key used to sign the
-certificate, the certificate will no longer be valid and you will need to
-generate a new key/certificate pair.
-
-Do this on your workstation.
-
-    triton profile cmon-certgen
-
-You'll get two files, `cmon-<account>-key.pem` and `cmon-<account>-cert.pem`.
-The account used will be the one specified in your profile.
-
-After generating the key/certificate pair, you can either `scp` these to your
-prometheus instance or add them to the instance metadata. See [CloudAPI
-documentation][cloudapi-doc] for details.
-
-[cloudapi-doc]: https://github.com/joyent/sdc-cloudapi/blob/master/docs/index.md#updatemachinemetadata-post-loginmachinesidmetadata
-
-### Test your Certificate / Endpoint
-
-**Note:** Add your domain.
-
-    $ curl --insecure --cert-type pem \
-        --cert "cmon-${TRITON_ACCOUNT}-cert.pem" \
-        --key "cmon-${TRITON_ACCOUNT}-key.pem" \
-        "https://cmon.YOURDOMAIN:9163/v1/discover"
-
-### Create a Prometheus Configuration
-
-Substitute values as appropriate. Filename should be `prom-cmon.yml`
+You can create jobs for additional datacenters, or create separate prometheus
+instances.
 
     global:
       scrape_interval:     10s
@@ -261,20 +296,15 @@ Substitute values as appropriate. Filename should be `prom-cmon.yml`
           target_label: account_name
           replacement: <account>
 
-## Start up Prometheus
+### Start up Prometheus
 
 We are going to use the service we created above here; however, one could also
 go through and use the command line exclusively to run it.
 
-### Run the Service Control Script
-
-     promserver# service prometheus start
-
-### Check the Log File
+    promserver# service prometheus start
 
 Any issues are going to be shown in the log file here; there are also numerous
-flags you can set in the invocation to adjust the way things are logged, so have
-at it if desired.
+flags you can set in the invocation to adjust the way things are logged, so
+have at it if desired.
 
      promserver# tail -f /var/log/prometheus.log
-
