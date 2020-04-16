@@ -10,7 +10,7 @@ metric collection agents is outside the scope of this document.
 This procedure assumes you have already completed the following prerequisite
 tasks:
 
-* Install Triton Data Center.
+* Install Triton DataCenter.
 * [Setup and configure Triton CNS][cns] (Triton Container Name Service).
 * Install the `node-triton` command line tool on your workstation.
 
@@ -113,8 +113,8 @@ in [CNS][cns]. Unlike other Triton services, you *may not* use a CNAME.
 It's also *highly* recommended to use ECDSA. RSA certificates carry a severe
 performance penalty due to the added crypto overhead.
 
-This needs to be done on headnode in each Triton Data Center. The TLS
-certificate will be deployed to all running CMON instances in that datacenter.
+This needs to be done on headnode in each Triton DataCenter. The TLS
+certificate will be deployed to all running CMON instances in that data center.
 
 Create `domains.ecdsa.txt`. The base name and wildcard name need to be on
 the same line. For example:
@@ -136,7 +136,7 @@ See [`triton-dehycrated`][td] for additional information.
 ### Add CMON to the CloudAPI Services
 
 CloudAPI can be queried to discover additional services provided by the
-datacenter. Run this to
+data center. Run this to
 
 Be sure to specify the correct CMON endpoint.
 
@@ -173,7 +173,7 @@ To generate the certificate, run this on your workstation:
 You'll get two files, `cmon-<account>-key.pem` and `cmon-<account>-cert.pem`.
 The account used will be the one specified in your profile.
 
-This key pair can be used with any Triton Data Center that shares the same
+This key pair can be used with any Triton DataCenter that shares the same
 UFDS database.
 
 ### Test your Certificate / Endpoint
@@ -224,7 +224,7 @@ documentation][cloudapi-doc] for details.
 
 This example uses a sample package from the dev data that can be optional added
 to Triton for non-production environments. For a production environment, choose
-an appropriately sized package available in your Triton datacenter.
+an appropriately sized package available in your Triton DataCenter.
 
     triton instance create ubuntu-certified-18.04 sample-1G
 
@@ -293,7 +293,7 @@ documentation for your distribution's init system for additional information.
 Substitute values as appropriate. In this example the filename will be
 `prom-cmon.yml`.
 
-You can create jobs for additional datacenters, or create separate Prometheus
+You can create jobs for additional data centers, or create separate Prometheus
 instances.
 
     global:
@@ -324,8 +324,8 @@ instances.
       relabel_configs:
         - source_labels: [__meta_triton_machine_alias]
           target_label: instance
-        - source_labels: [__param_datacenter_name]
-          target_label: datacenter_name
+        - source_labels: [__param_data center_name]
+          target_label: data center_name
           replacement: eg-1
         - source_labels: [__param_account]
           target_label: account_name
