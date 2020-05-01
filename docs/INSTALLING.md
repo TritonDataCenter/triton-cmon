@@ -324,8 +324,8 @@ instances.
       relabel_configs:
         - source_labels: [__meta_triton_machine_alias]
           target_label: instance
-        - source_labels: [__param_data center_name]
-          target_label: data center_name
+        - source_labels: [__param_datacenter_name]
+          target_label: datacenter_name
           replacement: eg-1
         - source_labels: [__param_account]
           target_label: account_name
