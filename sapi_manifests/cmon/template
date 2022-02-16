@@ -8,6 +8,12 @@
     "port": 9163,
     "serviceName": "{{SERVICE_NAME}}",
     "serverUuid": "{{auto.SERVER_UUID}}",
+    {{^CMON_SCRAPE_DOWN_INSTANCES}}
+    "scrape_down_instances": false,
+    {{/CMON_SCRAPE_DOWN_INSTANCES}}
+    {{#CMON_SCRAPE_DOWN_INSTANCES}}
+    "scrape_down_instances": true,
+    {{/CMON_SCRAPE_DOWN_INSTANCES}}
     "vmapi": {
         "url": "http://{{{vmapi_domain}}}"
     },
