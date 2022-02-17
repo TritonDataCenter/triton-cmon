@@ -8,7 +8,7 @@
     "port": 9163,
     "serviceName": "{{SERVICE_NAME}}",
     "serverUuid": "{{auto.SERVER_UUID}}",
-    "discover_include": "{{discover_include}}",
+    "discover_include_stopped": "{{discover_include_stopped}}",
     "vmapi": {
         "url": "http://{{{vmapi_domain}}}"
     },
