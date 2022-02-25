@@ -239,7 +239,7 @@ file.
 | server_opts                      | Object    | -          | CMON server options.                                                    |
 | server_opts.http_accept_encoding | String    | -          | When set to "enabled" CMON honors 'Accept-Encoding'                     |
 | throttle_opts                    | Object    | -          | Restify [throttle](http://restify.com/docs/plugins-api/#throttle) opts. |
-| discover_include_stopped         | String    | false      | Whether to include stopped instances in addition to running instances.  |
+| discoverIncludeStopped           | String    | false      | Whether to include stopped instances in addition to running instances.  |
 
 
 
@@ -257,4 +257,4 @@ production.
 | key                            | type    | default   | description                                          |
 | ------------------------------ | ------- | --------- | ---------------------------------------------------- |
 | HTTP_ACCEPT_ENCODING           | String  | ""        | Sets `server_opts.http_accept_encoding` above.       |
-| discover_include_stopped       | String  | false     | Sets `discover_include_stopped` above.               |
+| discover_include_stopped       | String  | false     | Sets `discoverIncludeStopped` above.                 |
