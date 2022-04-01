@@ -5,7 +5,7 @@
 #
 
 #
-# Copyright 2019 Joyent, Inc.
+# Copyright 2022 Joyent, Inc.
 #
 
 #
@@ -21,17 +21,18 @@ TOP ?= $(error Unable to access eng.git submodule Makefiles.)
 JS_FILES	:= ./bin/cmon $(shell find lib test -name '*.js')
 JSSTYLE_FILES	= $(JS_FILES)
 JSSTYLE_FLAGS	= -f tools/jsstyle.conf
-JSL_FILES_NODE  = $(JS_FILES)
-JSL_CONF_NODE   = tools/jsl.node.conf
+ESLINT_FILES   = $(JS_FILES)
 ESLINT		= ./node_modules/.bin/eslint
 ESLINT_FILES	= $(JS_FILES)
 
 SMF_MANIFESTS_IN = smf/manifests/cmon.xml.in
 
 # sdcnode (aka prebuilt-node) vars
-NODE_PREBUILT_VERSION=v6.17.0
+NODE_PREBUILT_VERSION=v6.17.1
 NODE_PREBUILT_TAG=zone64
-NODE_PREBUILT_IMAGE=c2c31b00-1d60-11e9-9a77-ff9f06554b0f
+NODE_PREBUILT_IMAGE=a7199134-7e94-11ec-be67-db6f482136c2
+
+BUILD_PLATFORM  = 20210826T002459Z
 
 ifeq ($(shell uname -s),SunOS)
 	include ./deps/eng/tools/mk/Makefile.node_prebuilt.defs
@@ -51,8 +52,8 @@ RELSTAGEDIR	:= /tmp/$(NAME)-$(STAMP)
 TAPE		= $(TOP)/node_modules/tape/bin/tape
 CLEAN_FILES	+= ./node_modules
 
-# our base image is triton-origin-x86_64-18.4.0
-BASE_IMAGE_UUID = a9368831-958e-432d-a031-f8ce6768d190
+# our base image is triton-origin-x86_64-21.4.0
+BASE_IMAGE_UUID = 502eeef2-8267-489f-b19c-a206906f57ef
 BUILDIMAGE_NAME = $(NAME)
 BUILDIMAGE_DESC	= Triton Container Monitor
 AGENTS		= config registrar
