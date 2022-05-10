@@ -30,6 +30,10 @@ function setup_tls_certificate() {
             -pkeyopt ec_param_enc:named_curve \
             -newkey ec -keyout /data/tls/key.pem \
             -out /data/tls/cert.pem -days 365
+	# Cmon's smf manifest defines "nobody" as the user.
+	# Without this line the svc goes into "maintenance"
+	# on boot.
+	chown nobody:nobody /data/tls/key.pem
         # Remember the certificate's host name used in the cert.
         echo "$HOST" > /data/tls/hostname
     fi
