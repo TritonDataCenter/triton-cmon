@@ -33,7 +33,7 @@ function setup_tls_certificate() {
             -out /data/tls/cert.pem -days 365
         # Ensure the cmon SMF service running as nobody can read the cert.
         # See TRITON-2306
-        chmod go+r key.pem
+        chmod go+r /data/tls/key.pem
         # Remember the certificate's host name used in the cert.
         echo "$HOST" > /data/tls/hostname
     fi
