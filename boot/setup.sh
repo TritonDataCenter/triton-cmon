@@ -8,6 +8,7 @@
 
 #
 # Copyright 2018 Joyent, Inc.
+# Copyright 2022 MNX Cloud, Inc.
 #
 
 export PS4='[\D{%FT%TZ}] ${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
@@ -30,6 +31,9 @@ function setup_tls_certificate() {
             -pkeyopt ec_param_enc:named_curve \
             -newkey ec -keyout /data/tls/key.pem \
             -out /data/tls/cert.pem -days 365
+        # Ensure the cmon SMF service running as nobody can read the cert.
+        # See TRITON-2306
+        chmod go+r key.pem
         # Remember the certificate's host name used in the cert.
         echo "$HOST" > /data/tls/hostname
     fi
