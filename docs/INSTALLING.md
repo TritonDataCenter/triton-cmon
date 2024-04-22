@@ -14,7 +14,7 @@ tasks:
 * [Setup and configure Triton CNS][cns] (Triton Container Name Service).
 * Install the `node-triton` command line tool on your workstation.
 
-[cns]: https://github.com/joyent/triton-cns/blob/master/docs/operator-guide.md
+[cns]: https://github.com/TritonDataCenter/triton-cns/blob/master/docs/operator-guide.md
 
 ## Install and Configure CMON
 
@@ -128,7 +128,7 @@ Then to generate your certificate run:
 
 See [`triton-dehycrated`][td] for additional information.
 
-[td]: https://github.com/joyent/triton-dehydrated
+[td]: https://github.com/TritonDataCenter/triton-dehydrated
 [le]: https://www.letsencrypt.org/
 
 <!-- Note: link for CNS is above so it doesn't need to be repeated here. -->
@@ -218,7 +218,7 @@ You can either `scp` the client certificate/key you created earlier to your
 Prometheus instance or add them to the instance metadata. See [CloudAPI
 documentation][cloudapi-doc] for details.
 
-[cloudapi-doc]: https://github.com/joyent/sdc-cloudapi/blob/master/docs/index.md#updatemachinemetadata-post-loginmachinesidmetadata
+[cloudapi-doc]: https://github.com/TritonDataCenter/sdc-cloudapi/blob/master/docs/index.md#updatemachinemetadata-post-loginmachinesidmetadata
 
 #### Example
 

@@ -1,11 +1,11 @@
 {
   "name": "triton-cmon",
   "description": "Triton Container Monitor",
-  "version": "1.8.5",
-  "author": "Joyent (joyent.com)",
+  "version": "1.8.6",
+  "author": "MNX Cloud (mnx.io)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/joyent/triton-cmon.git"
+    "url": "https://github.com/TritonDataCenter/triton-cmon.git"
   },
   "private": true,
   "dependencies": {
@@ -18,7 +18,7 @@
     "mahi": "2.4.1",
     "restify": "4.2.0",
     "sdc-clients": "13.0.5",
-    "sdc-scripts": "git+https://github.com/joyent/sdc-scripts.git#a88d76b",
+    "sdc-scripts": "git+https://github.com/TritonDataCenter/sdc-scripts.git#a88d76b",
     "sshpk": "1.14.2",
     "tape": "4.2.2",
     "triton-metrics": "1.0.3",

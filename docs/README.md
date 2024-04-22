@@ -211,7 +211,7 @@ Internal error
 
 ## Metrics
 
-CMON exposes metrics via [node-triton-metrics](https://github.com/joyent/node-triton-metrics) on `http://<ADMIN_IP>:8881/metrics.`
+CMON exposes metrics via [node-triton-metrics](https://github.com/TritonDataCenter/node-triton-metrics) on `http://<ADMIN_IP>:8881/metrics.`
 
 ## CMON Configuration File
 
@@ -235,7 +235,7 @@ file.
 | cnapi.url                        | String    | -          | CNAPI url.                                                              |
 | mahi                             | Object    | -          | Mahi configuration object.                                              |
 | mahi.url                         | String    | -          | Mahi url.                                                               |
-| changefeed_opts                  | Object    | -          | [changefeed](https://github.com/joyent/node-sdc-changefeed) options.    |
+| changefeed_opts                  | Object    | -          | [changefeed](https://github.com/TritonDataCenter/node-sdc-changefeed) options.    |
 | server_opts                      | Object    | -          | CMON server options.                                                    |
 | server_opts.http_accept_encoding | String    | -          | When set to "enabled" CMON honors 'Accept-Encoding'                     |
 | throttle_opts                    | Object    | -          | Restify [throttle](http://restify.com/docs/plugins-api/#throttle) opts. |
