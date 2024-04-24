@@ -6,6 +6,7 @@
 
 <!--
     Copyright (c) 2017, Joyent, Inc.
+    Copyright 2024 MNX Cloud, Inc.
 -->
 
 # Triton Container Monitor
@@ -16,7 +17,7 @@ node exporters by supporting a polling route per container per datacenter
 that the polling user has access to.
 
 Please see
-[RFD 27](https://github.com/joyent/rfd/blob/master/rfd/0027/README.md#) for more
+[RFD 27](https://github.com/TritonDataCenter/rfd/blob/master/rfd/0027/README.md#) for more
 information.
 
 ## Development
@@ -42,7 +43,7 @@ make release
 ## Documentation
 
 For an overview of the Triton Container Monitor solution, please see
-[RFD 27](https://github.com/joyent/rfd/blob/master/rfd/0027/README.md#).
+[RFD 27](https://github.com/TritonDataCenter/rfd/blob/master/rfd/0027/README.md#).
 
 For documentation specific to CMON, please see
 [docs/README.md](docs/README.md).
